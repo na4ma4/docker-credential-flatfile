@@ -1,0 +1,33 @@
+env:
+  - CGO_ENABLED=0
+
+before:
+  hooks:
+    - make test
+    - go generate ./...
+    - go mod tidy
+    - go mod download
+
+builds:
+  - id: docker-credential-flatfile
+    main: ./cmd/docker-credential-flatfile
+    binary: docker-credential-flatfile
+    targets:
+      - darwin_amd64
+      - darwin_arm64
+
+archives:
+
+checksum:
+  algorithm: sha256
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
