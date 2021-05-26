@@ -7,7 +7,7 @@ GIT_HASH ?= $(shell git show -s --format=%h)
 GO_DEBUG_ARGS   ?= -v -ldflags "-X main.version=$(GO_APP_VERSION)+debug -X main.commit=$(GIT_HASH) -X main.date=$(APP_DATE)"
 GO_RELEASE_ARGS ?= -v -ldflags "-X main.version=$(GO_APP_VERSION) -X main.commit=$(GIT_HASH) -X main.date=$(APP_DATE) -s -w"
 
-GOLANGCILINT_VERSION := v1.40.0
+GOLANGCILINT_VERSION := v1.40.1
 
 -include .makefiles/Makefile
 -include .makefiles/pkg/protobuf/v1/Makefile

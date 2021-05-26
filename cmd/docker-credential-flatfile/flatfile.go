@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -19,7 +18,11 @@ const lockTimeout = 10 * time.Second
 type Flatfile struct{}
 
 // Add appends credentials to the store.
-func (f Flatfile) Add(c *credentials.Credentials) (err error) {
+func (f Flatfile) Add(creds *credentials.Credentials) (err error) {
+	if creds == nil {
+		return credentials.NewErrCredentialsMissingUsername()
+	}
+
 	cs, lock, err := openFile()
 	defer lock.Unlock() //nolint: errcheck
 
@@ -27,7 +30,7 @@ func (f Flatfile) Add(c *credentials.Credentials) (err error) {
 		return err
 	}
 
-	cs.Store[c.ServerURL] = *c
+	cs.Store[creds.ServerURL] = *creds
 
 	if err = writeFile(cs); err != nil {
 		return err
@@ -38,6 +41,10 @@ func (f Flatfile) Add(c *credentials.Credentials) (err error) {
 
 // Delete removes credentials from the store.
 func (f Flatfile) Delete(serverURL string) error {
+	if serverURL == "" {
+		return credentials.NewErrCredentialsMissingServerURL()
+	}
+
 	cs, lock, err := openFile()
 	defer lock.Unlock() //nolint: errcheck
 
@@ -50,12 +57,13 @@ func (f Flatfile) Delete(serverURL string) error {
 	return writeFile(cs)
 }
 
-// ErrNotFound returned when credentials not found.
-var ErrNotFound = errors.New("credentials not found")
-
 // Get retrieves credentials from the store.
 // It returns username and secret as strings.
 func (f Flatfile) Get(serverURL string) (string, string, error) {
+	if serverURL == "" {
+		return "", "", credentials.NewErrCredentialsMissingServerURL()
+	}
+
 	cs, lock, err := openFile()
 	defer lock.Unlock() //nolint: errcheck
 
@@ -67,7 +75,7 @@ func (f Flatfile) Get(serverURL string) (string, string, error) {
 		return v.Username, v.Secret, nil
 	}
 
-	return "", "", ErrNotFound
+	return "", "", credentials.NewErrCredentialsNotFound()
 }
 
 // List returns the stored serverURLs and their associated usernames.
@@ -124,8 +132,7 @@ func writeFile(cs *credStore) error {
 		return fmt.Errorf("unable to marshal credentials: %w", err)
 	}
 
-	err = ioutil.WriteFile(filename, data, 0600)
-	if err != nil {
+	if err := ioutil.WriteFile(filename, data, 0600); err != nil {
 		return fmt.Errorf("unable to write file: %w", err)
 	}
 
