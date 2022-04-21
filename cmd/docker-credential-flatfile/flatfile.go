@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"runtime"
@@ -12,7 +13,10 @@ import (
 	"github.com/juju/fslock"
 )
 
-const lockTimeout = 10 * time.Second
+const (
+	lockTimeout        time.Duration = 10 * time.Second
+	credentialFileMode fs.FileMode   = 0o0600
+)
 
 // Flatfile implements the credentials.Helper interface.
 type Flatfile struct{}
@@ -23,16 +27,16 @@ func (f Flatfile) Add(creds *credentials.Credentials) (err error) {
 		return credentials.NewErrCredentialsMissingUsername()
 	}
 
-	cs, lock, err := openFile()
+	credStore, lock, err := openFile()
 	defer lock.Unlock() //nolint: errcheck
 
 	if err != nil {
 		return err
 	}
 
-	cs.Store[creds.ServerURL] = *creds
+	credStore.Store[creds.ServerURL] = *creds
 
-	if err = writeFile(cs); err != nil {
+	if err = writeFile(credStore); err != nil {
 		return err
 	}
 
@@ -45,16 +49,16 @@ func (f Flatfile) Delete(serverURL string) error {
 		return credentials.NewErrCredentialsMissingServerURL()
 	}
 
-	cs, lock, err := openFile()
+	credStore, lock, err := openFile()
 	defer lock.Unlock() //nolint: errcheck
 
 	if err != nil {
 		return err
 	}
 
-	delete(cs.Store, serverURL)
+	delete(credStore.Store, serverURL)
 
-	return writeFile(cs)
+	return writeFile(credStore)
 }
 
 // Get retrieves credentials from the store.
@@ -64,14 +68,14 @@ func (f Flatfile) Get(serverURL string) (string, string, error) {
 		return "", "", credentials.NewErrCredentialsMissingServerURL()
 	}
 
-	cs, lock, err := openFile()
+	credStore, lock, err := openFile()
 	defer lock.Unlock() //nolint: errcheck
 
 	if err != nil {
 		return "", "", err
 	}
 
-	if v, ok := cs.Store[serverURL]; ok {
+	if v, ok := credStore.Store[serverURL]; ok {
 		return v.Username, v.Secret, nil
 	}
 
@@ -80,7 +84,7 @@ func (f Flatfile) Get(serverURL string) (string, string, error) {
 
 // List returns the stored serverURLs and their associated usernames.
 func (f Flatfile) List() (map[string]string, error) {
-	cs, lock, err := openFile()
+	credStore, lock, err := openFile()
 	defer lock.Unlock() //nolint: errcheck
 
 	if err != nil {
@@ -88,7 +92,7 @@ func (f Flatfile) List() (map[string]string, error) {
 	}
 
 	o := map[string]string{}
-	for k, v := range cs.Store {
+	for k, v := range credStore.Store {
 		o[k] = v.Username
 	}
 
@@ -132,7 +136,7 @@ func writeFile(cs *credStore) error {
 		return fmt.Errorf("unable to marshal credentials: %w", err)
 	}
 
-	if err := ioutil.WriteFile(filename, data, 0600); err != nil {
+	if err := ioutil.WriteFile(filename, data, credentialFileMode); err != nil {
 		return fmt.Errorf("unable to write file: %w", err)
 	}
 

@@ -1,13 +1,12 @@
-GO_MATRIX_OS ?= darwin linux windows
-GO_MATRIX_ARCH ?= amd64
+GO_MATRIX += darwin/amd64
+GO_MATRIX += linux/amd64
+GO_MATRIX += windows/amd64
 
 APP_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 GIT_HASH ?= $(shell git show -s --format=%h)
 
 GO_DEBUG_ARGS   ?= -v -ldflags "-X main.version=$(GO_APP_VERSION)+debug -X main.commit=$(GIT_HASH) -X main.date=$(APP_DATE)"
 GO_RELEASE_ARGS ?= -v -ldflags "-X main.version=$(GO_APP_VERSION) -X main.commit=$(GIT_HASH) -X main.date=$(APP_DATE) -s -w"
-
-GOLANGCILINT_VERSION := v1.40.1
 
 -include .makefiles/Makefile
 -include .makefiles/pkg/protobuf/v1/Makefile
