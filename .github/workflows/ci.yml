@@ -18,4 +18,4 @@ jobs:
       - unittest
     uses: na4ma4/actions/.github/workflows/goreleaser.yml@v1
     secrets:
-      token: ${{ secrets.GO_RELEASER_GITHUB_TOKEN }}
+      token: ${{ secrets.GITHUB_TOKEN }}
