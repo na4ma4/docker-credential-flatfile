@@ -22,7 +22,7 @@ const (
 type Flatfile struct{}
 
 // Add appends credentials to the store.
-func (f Flatfile) Add(creds *credentials.Credentials) (err error) {
+func (f Flatfile) Add(creds *credentials.Credentials) error {
 	if creds == nil {
 		return credentials.NewErrCredentialsMissingUsername()
 	}
@@ -40,7 +40,7 @@ func (f Flatfile) Add(creds *credentials.Credentials) (err error) {
 		return err
 	}
 
-	return err
+	return nil
 }
 
 // Delete removes credentials from the store.
