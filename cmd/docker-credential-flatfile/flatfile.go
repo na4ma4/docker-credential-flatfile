@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"runtime"
 	"time"
@@ -115,7 +114,7 @@ func openFile() (*credStore, *fslock.Lock, error) {
 		return nil, lock, fmt.Errorf("unable to lock file: %w", err)
 	}
 
-	file, err := ioutil.ReadFile(filename)
+	file, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, lock, fmt.Errorf("unable to read file: %w", err)
 	}
@@ -136,7 +135,7 @@ func writeFile(cs *credStore) error {
 		return fmt.Errorf("unable to marshal credentials: %w", err)
 	}
 
-	if err := ioutil.WriteFile(filename, data, credentialFileMode); err != nil {
+	if err := os.WriteFile(filename, data, credentialFileMode); err != nil {
 		return fmt.Errorf("unable to write file: %w", err)
 	}
 
