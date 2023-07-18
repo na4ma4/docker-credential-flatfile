@@ -27,7 +27,7 @@ func (f Flatfile) Add(creds *credentials.Credentials) error {
 	}
 
 	credStore, lock, err := openFile()
-	defer lock.Unlock() //nolint: errcheck
+	defer lock.Unlock() //nolint:errcheck // ignore errors on Unlock.
 
 	if err != nil {
 		return err
@@ -35,11 +35,7 @@ func (f Flatfile) Add(creds *credentials.Credentials) error {
 
 	credStore.Store[creds.ServerURL] = *creds
 
-	if err = writeFile(credStore); err != nil {
-		return err
-	}
-
-	return nil
+	return writeFile(credStore)
 }
 
 // Delete removes credentials from the store.
@@ -49,7 +45,7 @@ func (f Flatfile) Delete(serverURL string) error {
 	}
 
 	credStore, lock, err := openFile()
-	defer lock.Unlock() //nolint: errcheck
+	defer lock.Unlock() //nolint:errcheck // ignore errors on Unlock.
 
 	if err != nil {
 		return err
@@ -68,7 +64,7 @@ func (f Flatfile) Get(serverURL string) (string, string, error) {
 	}
 
 	credStore, lock, err := openFile()
-	defer lock.Unlock() //nolint: errcheck
+	defer lock.Unlock() //nolint:errcheck // ignore errors on Unlock.
 
 	if err != nil {
 		return "", "", err
@@ -84,7 +80,7 @@ func (f Flatfile) Get(serverURL string) (string, string, error) {
 // List returns the stored serverURLs and their associated usernames.
 func (f Flatfile) List() (map[string]string, error) {
 	credStore, lock, err := openFile()
-	defer lock.Unlock() //nolint: errcheck
+	defer lock.Unlock() //nolint:errcheck // ignore errors on Unlock.
 
 	if err != nil {
 		return map[string]string{}, err
@@ -130,9 +126,9 @@ func openFile() (*credStore, *fslock.Lock, error) {
 func writeFile(cs *credStore) error {
 	filename := getFlatFile()
 
-	data, err := json.Marshal(cs)
-	if err != nil {
-		return fmt.Errorf("unable to marshal credentials: %w", err)
+	data, dataErr := json.Marshal(cs)
+	if dataErr != nil {
+		return fmt.Errorf("unable to marshal credentials: %w", dataErr)
 	}
 
 	if err := os.WriteFile(filename, data, credentialFileMode); err != nil {
