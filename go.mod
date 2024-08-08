@@ -1,9 +1,9 @@
 module github.com/na4ma4/docker-credential-flatfile
 
-go 1.20
+go 1.22.2
 
 require (
-	github.com/docker/docker-credential-helpers v0.8.1
+	github.com/docker/docker-credential-helpers v0.8.2
 	github.com/juju/fslock v0.0.0-20160525022230-4d5c94c67b4b
 )
 
