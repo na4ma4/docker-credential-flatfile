@@ -1,6 +1,6 @@
 module github.com/na4ma4/docker-credential-flatfile
 
-go 1.22.2
+go 1.25.0
 
 require (
 	github.com/docker/docker-credential-helpers v0.9.7
