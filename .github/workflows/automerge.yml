@@ -1,4 +1,4 @@
-name: Dependabot auto-merge
+name: Dependabot auto-approve
 
 on:
   pull_request:
@@ -8,3 +8,5 @@ jobs:
     name: "Dependabot"
     uses: na4ma4/actions/.github/workflows/dependabot-automerge.yml@main
     secrets: inherit
+    with:
+      merge-type: rebase
