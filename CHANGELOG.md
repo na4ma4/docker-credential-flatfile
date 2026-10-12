@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/na4ma4/docker-credential-flatfile/compare/v1.0.0...v1.0.1) (2026-10-12)
+
+
+### Bug Fixes
+
+* Update dependencies and refactor magefile ([ca61018](https://github.com/na4ma4/docker-credential-flatfile/commit/ca61018776dc28da5ff518b6466d03c9a2af5a69))
+
 ## 1.0.0 (2026-06-07)
 
 
