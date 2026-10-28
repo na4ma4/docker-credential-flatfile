@@ -3,7 +3,7 @@ module github.com/na4ma4/docker-credential-flatfile
 go 1.25.0
 
 require (
-	github.com/docker/docker-credential-helpers v0.9.10
+	github.com/docker/docker-credential-helpers v0.9.12
 	github.com/dosquad/mage v0.5.1
 	github.com/juju/fslock v0.0.0-20160525022230-4d5c94c67b4b
 	github.com/magefile/mage v1.17.2
